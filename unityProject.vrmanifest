@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.shapeinterpreter.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "/home/spellcheck/Documents/University/COMP4020/A2/ShapeInterpreter/actions.json",
+      "strings": {
+        "en_us": {
+          "name": "ShapeInterpreter [Testing]"
+        }
+      }
+    }
+  ]
+}

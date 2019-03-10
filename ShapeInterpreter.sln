@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "SteamVR.csproj", "{49508D38-C911-D9BD-2BB6-70E38F05763B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR", "SteamVR.csproj", "{49508D38-C911-D9BD-2BB6-70E38F05763B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "Assembly-CSharp.csproj", "{65D79C72-CBBB-C76A-BEEC-95A83539A6C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{65D79C72-CBBB-C76A-BEEC-95A83539A6C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "SteamVR_Actions.csproj", "{645D6872-7E8A-82D0-227A-099F49FCB601}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR_Actions", "SteamVR_Actions.csproj", "{645D6872-7E8A-82D0-227A-099F49FCB601}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "SteamVR_Editor.csproj", "{E72E78A7-6CFF-F46A-D184-52B6921167F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR_Editor", "SteamVR_Editor.csproj", "{E72E78A7-6CFF-F46A-D184-52B6921167F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "SteamVR_Input_Editor.csproj", "{5AA3FE3F-51D1-852A-B6BB-A00E14B7FA84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR_Input_Editor", "SteamVR_Input_Editor.csproj", "{5AA3FE3F-51D1-852A-B6BB-A00E14B7FA84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShapeInterpreter", "SteamVR_Windows_EditorHelper.csproj", "{20B05977-F389-CA35-5866-EE61759B38CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamVR_Windows_EditorHelper", "SteamVR_Windows_EditorHelper.csproj", "{20B05977-F389-CA35-5866-EE61759B38CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -16,6 +16,231 @@ using Valve.VR.InteractionSystem;
 
 public class ControllerFunctionality : MonoBehaviour {
 
+    enum Shape { SPHERE, CUBE, CYLINDER, LINE, DELETE };
+
+    public SteamVR_Action_Boolean grabPinchAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("GrabPinch");
+    public SteamVR_Action_Boolean touchPadAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("touchPad");
+    public SteamVR_Action_Boolean grabGripAction = SteamVR_Input.GetAction<SteamVR_Action_Boolean>("GrabGrip");
+    public SteamVR_Input_Sources handType;
+    
+    public GameObject cube_selector;
+    public GameObject sphere_selector;
+    public GameObject cylinder_selector;
+    public GameObject line_selector;
+    public GameObject cube;
+    public GameObject sphere;
+    public GameObject cylinder;
+    public GameObject line;
+    Shape currentShape;
+    Color color; 
+    
+    private LineRenderer lr; 
+    private LineRenderer spherelr; 
+    private LineRenderer cubelr; 
+    private LineRenderer cylinderlr; 
+    private LineRenderer linelr; 
+    private bool isTriggerPressed;
+
+   
+    private float lowestX = 0;
+    private float lowestY = 0;
+    private float lowestZ = 0;
+    private float highestX = 0;
+    private float highestY = 0;
+    private float highestZ = 0;
+    
+    private float lineLength; 
+    Quaternion rot = new Quaternion();
+    private Vector3 pressedDownPos; 
+    
+    private Hand hand;
+    private int i;               // Loop counter
+    private int indexCounter;   
+    
+    public void Awake() {
+        hand = GetComponent<Hand>();
+        
+        spherelr = sphere_selector.AddComponent<LineRenderer>();
+        cylinderlr = cylinder_selector.AddComponent<LineRenderer>();
+        linelr = line_selector.AddComponent<LineRenderer>();
+        cubelr = cube_selector.AddComponent<LineRenderer>();
+        
+        spherelr.SetWidth(0.03f, 0.03f);
+        cylinderlr.SetWidth(0.03f, 0.03f);
+        linelr.SetWidth(0.03f, 0.03f);
+        cubelr.SetWidth(0.03f, 0.03f);
+        
+        lr = spherelr;
+        
+        lr.positionCount = 0;
+        currentShape = Shape.SPHERE;
+        cube_selector.SetActive(false);
+        sphere_selector.SetActive(true);
+        cylinder_selector.SetActive(false);
+        line_selector.SetActive(false);
+        indexCounter = 0;
+        isTriggerPressed = false;
+    }
+    
+    public void Update() {
+        color = GameObject.Find("ColorPalette").GetComponent<Renderer>().material.color;
+        if (grabPinchAction.GetStateUp(handType)) {
+            isTriggerPressed = false;
+            GameObject newShape;    
+            // Change Shape
+
+            float xDiff = Mathf.Abs(highestX - lowestX); 
+            float yDiff = Mathf.Abs(highestY - lowestY); 
+            float zDiff = Mathf.Abs(highestZ - lowestZ);
+            Debug.Log("X diff is " + xDiff);
+            Debug.Log("Y diff is " + yDiff);
+            Debug.Log("Z diff is " + zDiff);
+            float scale;
+
+            if (xDiff > yDiff) {
+                scale = xDiff;
+            } else {
+                scale = yDiff;
+            }
+            if (scale < zDiff) {
+                scale = zDiff;
+            }
+
+
+            Vector3 pos = new Vector3(lowestX + (xDiff/2), lowestY + (yDiff/2), lowestZ + (zDiff/2));
+            Debug.Log(pos);
+            
+            switch (currentShape) {
+                case Shape.SPHERE: 
+                    newShape = Instantiate(sphere, pos, Quaternion.identity);
+                    newShape.GetComponent<Renderer>().material.color = color;
+                    newShape.transform.localScale = new Vector3(scale, scale, scale);
+                    Debug.Log("scale is " + newShape.transform.localScale);
+                    Debug.Log("scale is " + scale);
+                    break;
+                case Shape.CUBE: 
+                    newShape = Instantiate(cube, pos, Quaternion.identity);
+                    newShape.GetComponent<Renderer>().material.color = color;
+                    newShape.transform.localScale = new Vector3(scale, scale, scale);
+                    break;
+                case Shape.CYLINDER: 
+                    newShape = Instantiate(cylinder, pos, Quaternion.identity);
+                    newShape.GetComponent<Renderer>().material.color = color;
+                    newShape.transform.localScale = new Vector3(scale/2, scale/2, scale/2);
+                    break;
+                case Shape.LINE:
+                    lineLength = Vector3.Distance(pressedDownPos, hand.transform.position);
+                    rot = Quaternion.FromToRotation( Vector3.up, pressedDownPos - hand.transform.position);
+                    newShape = Instantiate(line, pos, rot);
+                    newShape.GetComponent<Renderer>().material.color = color;
+                    newShape.transform.localScale = new Vector3(0.005f, lineLength*0.5f, 0.005f);
+                    break;
+                case Shape.DELETE: 
+                    break;
+            }  
+            
+            lr.positionCount = 0;
+            indexCounter = 0;
+            Debug.Log("Trigger was pressed.");
+            
+        }
+        
+        if (grabPinchAction.GetStateDown(handType)) {
+            Debug.Log("Trigger was pressed.");
+            isTriggerPressed = true;
+
+            highestX = hand.transform.position.x;
+            highestY = hand.transform.position.y;
+            highestZ = hand.transform.position.z;
+            lowestX = hand.transform.position.x;
+            lowestY = hand.transform.position.y;
+            lowestZ = hand.transform.position.z;
+            
+            pressedDownPos = hand.transform.position;
+            
+        }
+        
+        if (isTriggerPressed) {
+            lr.positionCount = indexCounter+1;
+            lr.SetPosition(indexCounter, hand.transform.position);
+            indexCounter++;
+
+            if (hand.transform.position.x < lowestX) {
+                lowestX = hand.transform.position.x;
+            }
+            if (hand.transform.position.z < lowestZ) {
+                lowestZ = hand.transform.position.z;
+            }
+            if (hand.transform.position.y < lowestY) {
+                lowestY = hand.transform.position.y;
+            }
+            if (hand.transform.position.x > highestX) {
+                highestX = hand.transform.position.x;
+            }
+            if (hand.transform.position.y > highestY) {
+                highestY = hand.transform.position.y;
+            }
+            if (hand.transform.position.z > highestZ) {
+                highestZ = hand.transform.position.z;
+            }
+        }
+        
+        if (touchPadAction.GetStateDown(handType)) {
+            
+            // Draw Shape
+            switch (currentShape) {
+                case Shape.SPHERE: 
+                    currentShape = Shape.CUBE;
+                    cube_selector.SetActive(true);
+                    sphere_selector.SetActive(false);
+                    cylinder_selector.SetActive(false);
+                    line_selector.SetActive(false);
+                    lr = cubelr;
+                    break;
+                case Shape.CUBE: 
+                    currentShape = Shape.CYLINDER;
+                    cube_selector.SetActive(false);
+                    sphere_selector.SetActive(false);
+                    cylinder_selector.SetActive(true);
+                    line_selector.SetActive(false);
+                    lr = cylinderlr;
+                    break;
+                case Shape.CYLINDER: 
+                    currentShape = Shape.LINE;
+                    cube_selector.SetActive(false);
+                    sphere_selector.SetActive(false);
+                    cylinder_selector.SetActive(false);
+                    line_selector.SetActive(true);
+                    lr = linelr;
+                    break;
+                case Shape.LINE: 
+                    currentShape = Shape.DELETE;
+                    cube_selector.SetActive(false);
+                    sphere_selector.SetActive(false);
+                    cylinder_selector.SetActive(false);
+                    line_selector.SetActive(false);
+                    break;
+                case Shape.DELETE: 
+                    currentShape = Shape.SPHERE;
+                    cube_selector.SetActive(false);
+                    sphere_selector.SetActive(true);
+                    cylinder_selector.SetActive(false);
+                    line_selector.SetActive(false);
+                    lr = spherelr;
+                    break;
+            }
+       
+            Debug.Log("Touchpad was pressed. Shape is "+currentShape);
+        
+        }
+        
+        if (grabGripAction.GetStateDown(handType)) {
+            // Change color
+            Debug.Log("Grip button was pressed.");
+        }
+    
+    }
+
     /*private GameObject collidingObject;            // Object colliding with controller
     private GameObject objectInHand;              // Reference for object in hand
     private Hand hand; // Controller input
