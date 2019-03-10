@@ -55,10 +55,12 @@ public class ControllerFunctionality : MonoBehaviour {
     
     private Hand hand;
     private int i;               // Loop counter
-    private int indexCounter;   
+    private int indexCounter;
+    private List<GameObject> objectsToDelete;
     
     public void Awake() {
         hand = GetComponent<Hand>();
+        objectsToDelete = new List<GameObject>();
         
         spherelr = sphere_selector.AddComponent<LineRenderer>();
         cylinderlr = cylinder_selector.AddComponent<LineRenderer>();
@@ -81,7 +83,20 @@ public class ControllerFunctionality : MonoBehaviour {
         indexCounter = 0;
         isTriggerPressed = false;
     }
-    
+
+    public void OnTriggerEnter(Collider col) {
+        if (currentShape == Shape.DELETE && isTriggerPressed && col.gameObject.tag == "CreatedShape" && !objectsToDelete.Contains(col.gameObject)) {
+            objectsToDelete.Add(col.gameObject);
+        }
+    }
+
+    public void OnTriggerStay(Collider col)
+    {
+        if (currentShape == Shape.DELETE && isTriggerPressed && col.gameObject.tag == "CreatedShape" && !objectsToDelete.Contains(col.gameObject)) {
+            objectsToDelete.Add(col.gameObject);
+        }
+    }
+
     public void Update() {
         color = GameObject.Find("ColorPalette").GetComponent<Renderer>().material.color;
         if (grabPinchAction.GetStateUp(handType)) {
@@ -113,6 +128,8 @@ public class ControllerFunctionality : MonoBehaviour {
             switch (currentShape) {
                 case Shape.SPHERE: 
                     newShape = Instantiate(sphere, pos, Quaternion.identity);
+                    newShape.AddComponent<SphereCollider>();
+                    newShape.tag = "CreatedShape";
                     newShape.GetComponent<Renderer>().material.color = color;
                     newShape.transform.localScale = new Vector3(scale, scale, scale);
                     Debug.Log("scale is " + newShape.transform.localScale);
@@ -120,11 +137,15 @@ public class ControllerFunctionality : MonoBehaviour {
                     break;
                 case Shape.CUBE: 
                     newShape = Instantiate(cube, pos, Quaternion.identity);
+                    newShape.AddComponent<BoxCollider>();
+                    newShape.tag = "CreatedShape";
                     newShape.GetComponent<Renderer>().material.color = color;
                     newShape.transform.localScale = new Vector3(scale, scale, scale);
                     break;
                 case Shape.CYLINDER: 
                     newShape = Instantiate(cylinder, pos, Quaternion.identity);
+                    newShape.AddComponent<MeshCollider>().convex = true;
+                    newShape.tag = "CreatedShape";
                     newShape.GetComponent<Renderer>().material.color = color;
                     newShape.transform.localScale = new Vector3(scale/2, scale/2, scale/2);
                     break;
@@ -132,10 +153,16 @@ public class ControllerFunctionality : MonoBehaviour {
                     lineLength = Vector3.Distance(pressedDownPos, hand.transform.position);
                     rot = Quaternion.FromToRotation( Vector3.up, pressedDownPos - hand.transform.position);
                     newShape = Instantiate(line, pos, rot);
+                    newShape.AddComponent<MeshCollider>().convex = true;
+                    newShape.tag = "CreatedShape";
                     newShape.GetComponent<Renderer>().material.color = color;
                     newShape.transform.localScale = new Vector3(0.005f, lineLength*0.5f, 0.005f);
                     break;
                 case Shape.DELETE: 
+                    foreach (GameObject obj in objectsToDelete) {
+                        Destroy(obj);
+                    }
+                    objectsToDelete.Clear();
                     break;
             }  
             
